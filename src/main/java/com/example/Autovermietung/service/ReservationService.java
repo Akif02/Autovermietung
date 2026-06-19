@@ -1,8 +1,8 @@
 package com.example.Autovermietung.service;
 
-import com.example.Autovermietung.Entities.Auto;
-import com.example.Autovermietung.Entities.Reservation;
-import com.example.Autovermietung.Entities.User;
+import com.example.Autovermietung.entities.Auto;
+import com.example.Autovermietung.entities.Reservation;
+import com.example.Autovermietung.entities.User;
 import com.example.Autovermietung.dto.reservation.CreateReservationRequest;
 import com.example.Autovermietung.dto.reservation.ReservationResponse;
 import com.example.Autovermietung.enums.CarStatus;
@@ -12,6 +12,7 @@ import com.example.Autovermietung.repository.AutoRepository;
 import com.example.Autovermietung.repository.ReservationRepository;
 import com.example.Autovermietung.repository.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service-Klasse für die Geschäftslogik rund um Reservierungen.
@@ -43,7 +45,7 @@ public class ReservationService {
      * Erstellt eine neue Reservierung basierend auf den übergebenen Daten.
      * Prüft Verfügbarkeit, berechnet Preis und setzt Auto-Status auf RENTED.
      *
-     * @param request Das DTO mit den Reservierungsdetails (AutoID, UserID, Zeiten).
+     * @param request Das DTO mit den Reservierungsdetails (AutoID, Zeiten).
      * @return Die erstellte Reservierung als Response-DTO.
      */
     @Transactional
@@ -52,8 +54,8 @@ public class ReservationService {
         Auto auto = autoRepository.findById(request.autoId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Auto nicht gefunden"));
 
-
-        User user = userRepository.findById(request.userId())
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User nicht gefunden"));
 
 
@@ -67,7 +69,7 @@ public class ReservationService {
         }
 
 
-        long days = ChronoUnit.DAYS.between(request.startDateTime(), request.endDateTime());
+        long days = ChronoUnit.DAYS.between(request.startDateTime().toLocalDate(), request.endDateTime().toLocalDate());
         if (days < 1) days = 1;
         BigDecimal totalPrice = auto.getPricePerDay().multiply(BigDecimal.valueOf(days));
 
@@ -95,43 +97,65 @@ public class ReservationService {
      *
      * @return Eine Liste aller Reservierungen.
      */
-    public List<Reservation> getAll() {
-        return repoReservation.findAll();
+    @Transactional(readOnly = true)
+    public List<ReservationResponse> getAll() {
+        return repoReservation.findAll().stream()
+                .map(ReservationMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     /**
      * Sucht eine Reservierung anhand ihrer ID.
+     * Prüft, ob der angemeldete User Berechtigung hat.
      *
      * @param id Die ID der gesuchten Reservierung.
      * @return Die gefundene Reservierung.
-     * @throws ResponseStatusException (404 NOT FOUND), wenn die Reservierung nicht existiert.
+     * @throws ResponseStatusException (404 NOT FOUND), wenn die Reservierung nicht existiert oder (403 FORBIDDEN).
      */
-    public Reservation getOne(Long id) {
-        return repoReservation.findById(id)
+    @Transactional(readOnly = true)
+    public ReservationResponse getOne(Long id) {
+        Reservation reservation = repoReservation.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
+
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !reservation.getUser().getEmail().equals(currentUserEmail)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
+        return ReservationMapper.toResponse(reservation);
     }
 
     /**
      * Storniert eine Reservierung. Setzt Status auf CANCELLED und gibt Auto wieder frei.
+     * Prüft Berechtigung.
      *
      * @param reservationID Die ID der zu stornierenden Reservierung.
      * @return Die aktualisierte Reservierung mit Status CANCELLED.
-     * @throws ResponseStatusException (404 NOT FOUND), wenn die Reservierung nicht existiert.
+     * @throws ResponseStatusException (404 NOT FOUND), wenn die Reservierung nicht existiert oder 403.
      */
     @Transactional
-    public Reservation cancelReservation(Long reservationID) {
+    public ReservationResponse cancelReservation(Long reservationID) {
         Reservation reservation = repoReservation.findById(reservationID)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
-        
 
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !reservation.getUser().getEmail().equals(currentUserEmail)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        
         reservation.setStatus(ReservationStatus.CANCELLED);
         
-
         Auto auto = reservation.getAuto();
         auto.setStatus(CarStatus.AVAILABLE);
         autoRepository.save(auto);
 
-        return repoReservation.save(reservation);
+        return ReservationMapper.toResponse(repoReservation.save(reservation));
     }
 
     /**
@@ -140,6 +164,7 @@ public class ReservationService {
      * @param reservationID Die ID der zu löschenden Reservierung.
      * @throws ResponseStatusException (404 NOT FOUND), wenn die Reservierung nicht existiert.
      */
+    @Transactional
     public void deleteReservation(Long reservationID) {
         Reservation reservation = repoReservation.findById(reservationID)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
@@ -153,8 +178,11 @@ public class ReservationService {
      * @param userID Die ID des Benutzers.
      * @return Eine Liste der Reservierungen dieses Benutzers.
      */
-    public List<Reservation> getByUser(Long userID) {
-        return repoReservation.findByUserId(userID);
+    @Transactional(readOnly = true)
+    public List<ReservationResponse> getByUser(Long userID) {
+        return repoReservation.findByUserId(userID).stream()
+                .map(ReservationMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     /**

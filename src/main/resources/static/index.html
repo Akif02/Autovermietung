@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SleekDrive | Premium Autovermietung</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand" onclick="app.showHome()">
+            <span>Sleek</span>Drive
+        </div>
+        <div class="nav-links">
+            <a href="#" onclick="app.showHome()">Flotte</a>
+            <div id="nav-auth-container">
+                <button class="btn btn-outline" onclick="app.openLoginModal()" id="btn-login-nav">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container: Home / Flotte -->
+    <main id="page-home" class="page active">
+        <!-- Top Bar -->
+        <div class="top-banner">
+            Premium Fahrzeuge für besondere Momente. Ohne Kompromisse.
+        </div>
+
+        <!-- Hero Section -->
+        <header class="hero-sixt">
+            <div class="hero-bg">
+                <!-- Using an elegant dark car image from the static assets -->
+                <img src="images/hero_car_cool.png" alt="Cool Sports Car">
+            </div>
+            
+            <div class="hero-widget">
+                <div class="widget-tabs">
+                    <button class="tab active">Autos</button>
+                    <button class="tab">Transporter</button>
+                    <button class="tab">Auto Abo</button>
+                </div>
+                
+                <div class="widget-content">
+                    <div class="widget-row">
+                        <div class="widget-group">
+                            <label>Fahrzeug Kategorie</label>
+                            <select id="filter-category" class="widget-input" onchange="app.applyFilters()">
+                                <option value="ALL">Alle Kategorien</option>
+                                <option value="LIMOUSINE">Limousine</option>
+                                <option value="SUV">SUV</option>
+                                <option value="KOMBI">Kombi</option>
+                                <option value="FAMILIENAUTO">Familienauto</option>
+                                <option value="COUPE">Coupé</option>
+                            </select>
+                        </div>
+                        <div class="widget-group">
+                            <label>Kraftstoff / Antrieb</label>
+                            <select id="filter-fuel" class="widget-input" onchange="app.applyFilters()">
+                                <option value="ALL">Alle Antriebe</option>
+                                <option value="BENZIN">Benzin</option>
+                                <option value="DIESEL">Diesel</option>
+                                <option value="HYBRID">Hybrid</option>
+                                <option value="ELEKTRO">Elektro</option>
+                            </select>
+                        </div>
+                        <div class="widget-btn-group">
+                            <button class="btn btn-primary btn-large widget-btn" onclick="document.getElementById('car-grid-section').scrollIntoView({behavior: 'smooth'})">Autos anzeigen</button>
+                        </div>
+                    </div>
+                    
+                    <div class="widget-footer">
+                        <div class="discount-badge">-20%</div>
+                        <span>Bis zu 20% Rabatt sichern: Wochenendtrip buchen und losfahren!</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Auto Grid Section -->
+        <section id="car-grid-section" class="section">
+            <div class="section-header" style="display: none;">
+                <h2>Unsere Flotte</h2>
+            </div>
+            
+            <div id="car-grid" class="car-grid">
+                <!-- Cars will be injected here by JS -->
+                <div class="loader"></div>
+            </div>
+        </section>
+
+        <!-- Big Orange Banner -->
+        <div class="sixt-banner-bottom">
+            <h2>PREMIUM AUTOS MIETEN.<br>ECONOMY BEZAHLEN.</h2>
+        </div>
+    </main>
+
+    <!-- Main Container: Dashboard (User) -->
+    <main id="page-dashboard" class="page">
+        <section class="section dashboard-section">
+            <div class="dashboard-header">
+                <h2>Mein Profil</h2>
+                <div class="user-info" id="dashboard-user-info"></div>
+            </div>
+
+            <!-- Profile Edit Form -->
+            <div class="profile-edit-container glass" style="padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+                <h3>Profil bearbeiten</h3>
+                <form id="form-profile-edit" onsubmit="app.handleProfileUpdate(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="profile-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>E-Mail</label>
+                            <input type="email" id="profile-email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Telefon</label>
+                            <input type="tel" id="profile-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Geburtsdatum</label>
+                            <input type="date" id="profile-birthdate" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Adresse</label>
+                        <input type="text" id="profile-address" required>
+                    </div>
+                    <div class="form-group checkbox">
+                        <input type="checkbox" id="profile-license">
+                        <label for="profile-license">Führerschein vorhanden</label>
+                    </div>
+                    <div id="profile-error" class="error-msg"></div>
+                    <div id="profile-success" class="success-msg"></div>
+                    <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+                </form>
+            </div>
+
+            <div class="reservations-container">
+                <h3>Meine Buchungen</h3>
+                <div id="reservations-list" class="reservations-list">
+                    <!-- Reservations will be injected here by JS -->
+                </div>
+            </div>
+
+            <!-- Admin Panels -->
+            <div id="admin-panels" style="display: none; margin-top: 4rem;">
+                <h2 style="border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem; margin-bottom: 2rem;">Admin Bereich</h2>
+                
+                <!-- All Users -->
+                <div class="admin-panel glass" style="padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+                    <h3>Kundenverwaltung</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="admin-table" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #444; text-align: left;">
+                                    <th style="padding: 1rem;">ID</th>
+                                    <th style="padding: 1rem;">Name</th>
+                                    <th style="padding: 1rem;">E-Mail</th>
+                                    <th style="padding: 1rem;">Telefon</th>
+                                    <th style="padding: 1rem;">Rolle</th>
+                                    <th style="padding: 1rem;">Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-list">
+                                <!-- Users injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- All Reservations -->
+                <div class="admin-panel glass" style="padding: 2rem; border-radius: 12px;">
+                    <h3>Alle Buchungen im System</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="admin-table" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #444; text-align: left;">
+                                    <th style="padding: 1rem;">ID</th>
+                                    <th style="padding: 1rem;">Auto</th>
+                                    <th style="padding: 1rem;">Kunde</th>
+                                    <th style="padding: 1rem;">Zeitraum</th>
+                                    <th style="padding: 1rem;">Preis</th>
+                                    <th style="padding: 1rem;">Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-reservations-list">
+                                <!-- All reservations injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="modal-login" class="modal">
+        <div class="modal-content glass">
+            <span class="close" onclick="app.closeModals()">&times;</span>
+            <h2 id="auth-title">Willkommen zurück</h2>
+            <form id="form-login" onsubmit="app.handleAuth(event)">
+                <div class="form-group">
+                    <label>E-Mail</label>
+                    <input type="email" id="auth-email" required placeholder="name@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Passwort</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••">
+                </div>
+                
+                <!-- Registration fields (hidden by default) -->
+                <div id="register-fields" style="display:none;">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="auth-name" placeholder="Max Mustermann">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefon</label>
+                        <input type="tel" id="auth-phone" placeholder="+49 123 456789">
+                    </div>
+                    <div class="form-group">
+                        <label>Adresse</label>
+                        <input type="text" id="auth-address" placeholder="Musterstraße 1">
+                    </div>
+                    <div class="form-group">
+                        <label>Geburtsdatum</label>
+                        <input type="date" id="auth-birthdate">
+                    </div>
+                    <div class="form-group checkbox">
+                        <input type="checkbox" id="auth-license">
+                        <label for="auth-license">Ich besitze einen gültigen Führerschein</label>
+                    </div>
+                </div>
+
+                <div id="auth-error" class="error-msg"></div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="btn-submit-auth">Einloggen</button>
+            </form>
+            <div class="auth-switch">
+                <span id="auth-switch-text">Neu hier?</span>
+                <a href="#" onclick="app.toggleAuthMode()">Registrieren</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="modal-booking" class="modal">
+        <div class="modal-content glass booking-modal">
+            <span class="close" onclick="app.closeModals()">&times;</span>
+            <h2>Buchung konfigurieren</h2>
+            <div id="booking-car-info" class="booking-car-info">
+                <!-- Car info injected here -->
+            </div>
+            <form id="form-booking" onsubmit="app.handleBooking(event)">
+                <input type="hidden" id="book-car-id">
+                <input type="hidden" id="book-car-price">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Startdatum</label>
+                        <input type="date" id="book-start" required onchange="app.calculatePrice()">
+                    </div>
+                    <div class="form-group">
+                        <label>Enddatum</label>
+                        <input type="date" id="book-end" required onchange="app.calculatePrice()">
+                    </div>
+                </div>
+                
+                <div class="price-calculator">
+                    <div class="calc-row">
+                        <span>Tage:</span>
+                        <span id="calc-days">0</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Preis/Tag:</span>
+                        <span id="calc-price-day">0 €</span>
+                    </div>
+                    <div class="calc-row total">
+                        <span>Gesamtpreis:</span>
+                        <span id="calc-total">0 €</span>
+                    </div>
+                </div>
+
+                <div id="booking-error" class="error-msg"></div>
+                <div id="booking-success" class="success-msg"></div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="btn-submit-booking">Kostenpflichtig Buchen</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Modals -->
+    <div id="modal-admin-car" class="modal">
+        <div class="modal-content glass">
+            <span class="close" onclick="app.closeModals()">&times;</span>
+            <h2 id="admin-car-title">Neues Fahrzeug</h2>
+            <form id="form-admin-car" onsubmit="app.handleAdminCar(event)">
+                <input type="hidden" id="admin-car-id">
+                <div class="form-group">
+                    <label>Marke & Modell</label>
+                    <input type="text" id="admin-car-brand" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kategorie</label>
+                        <select id="admin-car-cat" required style="width:100%; padding:0.8rem; background:rgba(0,0,0,0.3); color:white; border:1px solid var(--glass-border); border-radius:8px;">
+                            <option value="LIMOUSINE">Limousine</option>
+                            <option value="SUV">SUV</option>
+                            <option value="KOMBI">Kombi</option>
+                            <option value="FAMILIENAUTO">Familienauto</option>
+                            <option value="COUPE">Coupé</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kraftstoff</label>
+                        <select id="admin-car-fuel" required style="width:100%; padding:0.8rem; background:rgba(0,0,0,0.3); color:white; border:1px solid var(--glass-border); border-radius:8px;">
+                            <option value="BENZIN">Benzin</option>
+                            <option value="DIESEL">Diesel</option>
+                            <option value="HYBRID">Hybrid</option>
+                            <option value="ELEKTRO">Elektro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Preis pro Tag (€)</label>
+                        <input type="number" id="admin-car-price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sitze</label>
+                        <input type="number" id="admin-car-seats" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Getriebe</label>
+                        <input type="text" id="admin-car-trans" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kennzeichen</label>
+                        <input type="text" id="admin-car-license" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Speichern</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JS Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

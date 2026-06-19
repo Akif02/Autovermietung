@@ -1,4 +1,4 @@
-package com.example.Autovermietung.Entities;
+package com.example.Autovermietung.entities;
 
 import com.example.Autovermietung.enums.CarStatus;
 import com.example.Autovermietung.enums.Category;

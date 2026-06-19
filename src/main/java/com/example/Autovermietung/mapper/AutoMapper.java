@@ -1,6 +1,6 @@
 package com.example.Autovermietung.mapper;
 
-import com.example.Autovermietung.Entities.Auto;
+import com.example.Autovermietung.entities.Auto;
 import com.example.Autovermietung.dto.auto.AutoResponse;
 import com.example.Autovermietung.dto.auto.CreateAutoRequest;
 import com.example.Autovermietung.dto.auto.UpdateAutoRequest;
@@ -34,6 +34,7 @@ public final class AutoMapper {
 
     public static  AutoResponse responseEntity(Auto auto){
         return new AutoResponse(
+                auto.getId(),
                 auto.getBrand(),
                 auto.getCategory(),
                 auto.getSeats(),

@@ -1,4 +1,4 @@
-package com.example.Autovermietung.Entities;
+package com.example.Autovermietung.entities;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;

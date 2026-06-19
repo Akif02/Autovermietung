@@ -1,6 +1,5 @@
 package com.example.Autovermietung.controller;
 
-import com.example.Autovermietung.Entities.Reservation;
 import com.example.Autovermietung.dto.reservation.CreateReservationRequest;
 import com.example.Autovermietung.dto.reservation.ReservationResponse;
 import jakarta.validation.Valid;
@@ -47,8 +46,8 @@ public class ReservationController {
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Reservation>> getAll() {
-        List<Reservation> alle = service.getAll();
+    public ResponseEntity<List<ReservationResponse>> getAll() {
+        List<ReservationResponse> alle = service.getAll();
         return new ResponseEntity<>(alle, HttpStatus.OK);
     }
 
@@ -60,8 +59,8 @@ public class ReservationController {
      */
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Reservation> getOne(@PathVariable Long id) {
-        Reservation r = service.getOne(id);
+    public ResponseEntity<ReservationResponse> getOne(@PathVariable Long id) {
+        ReservationResponse r = service.getOne(id);
         return new ResponseEntity<>(r, HttpStatus.OK);
     }
 
@@ -73,8 +72,8 @@ public class ReservationController {
      */
     @PatchMapping("/cancel/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Reservation> cancel(@PathVariable Long id) {
-        Reservation cancelledReservation = service.cancelReservation(id);
+    public ResponseEntity<ReservationResponse> cancel(@PathVariable Long id) {
+        ReservationResponse cancelledReservation = service.cancelReservation(id);
         return new ResponseEntity<>(cancelledReservation, HttpStatus.OK);
     }
 
@@ -99,8 +98,8 @@ public class ReservationController {
      */
     @GetMapping("/user/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<Reservation>> getByUser(@PathVariable Long id) {
-        List<Reservation> alle = service.getByUser(id);
+    public ResponseEntity<List<ReservationResponse>> getByUser(@PathVariable Long id) {
+        List<ReservationResponse> alle = service.getByUser(id);
         return new ResponseEntity<>(alle, HttpStatus.OK);
     }
 }

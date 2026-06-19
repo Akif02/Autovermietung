@@ -1,6 +1,6 @@
 package com.example.Autovermietung.repository;
 
-import com.example.Autovermietung.Entities.User;
+import com.example.Autovermietung.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

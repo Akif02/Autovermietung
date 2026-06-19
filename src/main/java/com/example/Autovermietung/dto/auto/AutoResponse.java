@@ -7,6 +7,7 @@ import com.example.Autovermietung.enums.Fuel;
 import java.math.BigDecimal;
 
 public record AutoResponse (
+        Long id,
         String brand,
         Category category,
         Integer seats,

@@ -9,6 +9,7 @@ public record UserResponse(
         String phone,
         String address,
         boolean hasDriverLicense,
-        LocalDate birthDate
+        LocalDate birthDate,
+        String role
 ) {
 }

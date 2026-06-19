@@ -1,6 +1,6 @@
 package com.example.Autovermietung.repository;
 
-import com.example.Autovermietung.Entities.Auto;
+import com.example.Autovermietung.entities.Auto;
 import com.example.Autovermietung.enums.Category;
 import com.example.Autovermietung.enums.Fuel;
 import org.springframework.data.jpa.repository.JpaRepository;

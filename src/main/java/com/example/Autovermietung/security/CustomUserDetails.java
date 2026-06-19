@@ -1,6 +1,6 @@
 package com.example.Autovermietung.security;
 
-import com.example.Autovermietung.Entities.User;
+import com.example.Autovermietung.entities.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

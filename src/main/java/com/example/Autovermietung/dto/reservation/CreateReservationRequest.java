@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 public record CreateReservationRequest(
         @NotNull Long autoId,
-        @NotNull Long userId,
         
         @NotNull 
         @FutureOrPresent 

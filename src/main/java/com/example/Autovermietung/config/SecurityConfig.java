@@ -3,6 +3,7 @@ package com.example.Autovermietung.config;
 import com.example.Autovermietung.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -41,8 +42,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())) // Wichtig für H2-Console (iframes)
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll() 
+                .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**").permitAll() // Frontend erlauben
+                .requestMatchers("/h2-console/**").permitAll() // H2-Datenbank Konsole erlauben
+                .requestMatchers(HttpMethod.POST, "/api/users").permitAll() 
+                .requestMatchers(HttpMethod.GET, "/auto/**").permitAll() 
+                .anyRequest().authenticated() 
             )
             .httpBasic(Customizer.withDefaults());
 

@@ -1,6 +1,6 @@
 package com.example.Autovermietung.service;
 
-import com.example.Autovermietung.Entities.Auto;
+import com.example.Autovermietung.entities.Auto;
 import com.example.Autovermietung.dto.auto.AutoResponse;
 import com.example.Autovermietung.dto.auto.CreateAutoRequest;
 import com.example.Autovermietung.enums.CarStatus;
@@ -52,8 +52,10 @@ public class AutoService {
      *
      * @return Eine Liste aller Fahrzeuge.
      */
-    public List<Auto> getAll() {
-        return repo.findAll();
+    public List<AutoResponse> getAll() {
+        return repo.findAll().stream()
+                .map(AutoMapper::responseEntity)
+                .toList();
     }
 
     /**
@@ -63,9 +65,10 @@ public class AutoService {
      * @return Das gefundene Fahrzeug.
      * @throws ResponseStatusException (404 NOT FOUND), wenn das Fahrzeug nicht existiert.
      */
-    public Auto getOne(long id) {
-        return repo.findById(id)
+    public AutoResponse getOne(long id) {
+        Auto auto = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Auto not found"));
+        return AutoMapper.responseEntity(auto);
     }
 
     /**

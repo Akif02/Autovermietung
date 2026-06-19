@@ -1,6 +1,6 @@
 package com.example.Autovermietung.service;
 
-import com.example.Autovermietung.Entities.User;
+import com.example.Autovermietung.entities.User;
 import com.example.Autovermietung.dto.user.CreateUserRequest;
 import com.example.Autovermietung.dto.user.UpdateUserRequest;
 import com.example.Autovermietung.dto.user.UserResponse;
@@ -94,8 +94,10 @@ public class UserService {
      *
      * @return Eine Liste aller Benutzer.
      */
-    public List<User> getAll() {
-        return repo.findAll();
+    public List<UserResponse> getAll() {
+        return repo.findAll().stream()
+                .map(UserMapper::toResponse)
+                .toList();
     }
 
     /**
@@ -109,6 +111,14 @@ public class UserService {
     public UserResponse update(UpdateUserRequest request, long id) {
         User aktuellerUser = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        String currentEmail = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean isAdmin = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !aktuellerUser.getEmail().equals(currentEmail)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
 
         UserMapper.updateEntity(aktuellerUser, request);
 
@@ -125,6 +135,14 @@ public class UserService {
     public void delete(Long id) {
         User u = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        String currentEmail = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean isAdmin = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !u.getEmail().equals(currentEmail)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
 
         repo.delete(u);
     }

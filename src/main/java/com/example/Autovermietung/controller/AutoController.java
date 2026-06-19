@@ -1,6 +1,6 @@
 package com.example.Autovermietung.controller;
 
-import com.example.Autovermietung.Entities.Auto;
+import com.example.Autovermietung.entities.Auto;
 import com.example.Autovermietung.dto.auto.AutoResponse;
 import com.example.Autovermietung.dto.auto.CreateAutoRequest;
 import com.example.Autovermietung.enums.CarStatus;
@@ -52,8 +52,8 @@ public class AutoController {
      * @return Eine Liste aller Autos mit Status 200 OK.
      */
     @GetMapping("/all")
-    public ResponseEntity<List<Auto>> alleAutos() {
-        List<Auto> alle = service.getAll();
+    public ResponseEntity<List<AutoResponse>> alleAutos() {
+        List<AutoResponse> alle = service.getAll();
         return new ResponseEntity<>(alle, HttpStatus.OK);
     }
 
@@ -64,8 +64,8 @@ public class AutoController {
      * @return Das gefundene Fahrzeug mit Status 200 OK.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Auto> getOne(@PathVariable long id) {
-        Auto a1 = service.getOne(id);
+    public ResponseEntity<AutoResponse> getOne(@PathVariable long id) {
+        AutoResponse a1 = service.getOne(id);
         return new ResponseEntity<>(a1, HttpStatus.OK);
     }
 

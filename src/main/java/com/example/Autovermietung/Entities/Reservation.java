@@ -1,4 +1,4 @@
-package com.example.Autovermietung.Entities;
+package com.example.Autovermietung.entities;
 
 import com.example.Autovermietung.enums.ReservationStatus;
 import jakarta.persistence.*;
@@ -11,9 +11,9 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Auto auto;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

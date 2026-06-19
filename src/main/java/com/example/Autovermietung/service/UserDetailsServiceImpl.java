@@ -1,6 +1,6 @@
 package com.example.Autovermietung.service;
 
-import com.example.Autovermietung.Entities.User;
+import com.example.Autovermietung.entities.User;
 import com.example.Autovermietung.repository.UserRepository;
 import com.example.Autovermietung.security.CustomUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;

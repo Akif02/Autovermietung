@@ -1,6 +1,6 @@
 package com.example.Autovermietung.controller;
 
-import com.example.Autovermietung.Entities.User;
+import com.example.Autovermietung.entities.User;
 import com.example.Autovermietung.dto.user.CreateUserRequest;
 import com.example.Autovermietung.dto.user.UpdateUserRequest;
 import com.example.Autovermietung.dto.user.UserResponse;
@@ -45,9 +45,9 @@ public class UserController {
      * @return Eine Liste aller Benutzer mit Status 302 Found.
      */
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
-        List<User> alle = service.getAll();
-        return new ResponseEntity<>(alle, HttpStatus.FOUND);
+    public ResponseEntity<List<UserResponse>> getAll() {
+        List<UserResponse> alle = service.getAll();
+        return new ResponseEntity<>(alle, HttpStatus.OK);
     }
 
     /**
@@ -57,9 +57,9 @@ public class UserController {
      * @return Der gefundene Benutzer mit Status 302 Found.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<User> getOne(@PathVariable Long id) {
-        User u = service.getByID(id);
-        return new ResponseEntity<>(u, HttpStatus.FOUND);
+    public ResponseEntity<UserResponse> getOne(@PathVariable Long id) {
+        UserResponse u = service.getResponseByID(id);
+        return new ResponseEntity<>(u, HttpStatus.OK);
     }
 
     /**
@@ -71,7 +71,7 @@ public class UserController {
     @GetMapping("/email")
     public ResponseEntity<UserResponse> getByEmail(@RequestParam(value = "email") String email) {
         UserResponse u = service.getByEmail(email);
-        return new ResponseEntity<>(u, HttpStatus.FOUND);
+        return new ResponseEntity<>(u, HttpStatus.OK);
     }
 
     /**

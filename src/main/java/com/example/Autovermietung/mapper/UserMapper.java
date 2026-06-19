@@ -1,6 +1,6 @@
 package com.example.Autovermietung.mapper;
 
-import com.example.Autovermietung.Entities.User;
+import com.example.Autovermietung.entities.User;
 import com.example.Autovermietung.dto.user.CreateUserRequest;
 import com.example.Autovermietung.dto.user.UpdateUserRequest;
 import com.example.Autovermietung.dto.user.UserResponse;
@@ -41,7 +41,8 @@ public final class UserMapper {
                 user.getPhone(),
                 user.getAddress(),
                 user.isHasDriverLicense(),
-                user.getBirthDate()
+                user.getBirthDate(),
+                user.getRole()
         );
     }
 }
